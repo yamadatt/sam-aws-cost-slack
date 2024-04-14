@@ -1,141 +1,60 @@
-# sam-app
 
-This is a sample template for sam-app - Below is a brief explanation of what we have generated for you:
+## このリポジトリは？
 
-```bash
-.
-├── Makefile                    <-- Make to automate build
-├── README.md                   <-- This instructions file
-├── hello-world                 <-- Source code for a lambda function
-│   ├── main.go                 <-- Lambda function code
-│   └── main_test.go            <-- Unit tests
-└── template.yaml
-```
+以下のリポジトリを参考にSAMで動作するように変更した。
 
-## Requirements
+https://github.com/tetsuya28/aws-cost-report
 
-* AWS CLI already configured with Administrator permission
-* [Docker installed](https://www.docker.com/community-edition)
-* [Golang](https://golang.org)
-* SAM CLI - [Install the SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
+## 何ができるの？
 
-## Setup process
+以下のように毎朝9:00に前日のAWS利用料をslackに通知する。
 
-### Installing dependencies & building the target 
+![](./docs/Slack-example.jpg)
 
-In this example we use the built-in `sam build` to automatically download all the dependencies and package our build target.   
-Read more about [SAM Build here](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-build.html) 
 
-The `sam build` command is wrapped inside of the `Makefile`. To execute this simply run
- 
-```shell
-make
-```
+## ローカルでテストしたい場合
 
-### Local development
+環境変数に```SLACK_TOKEN```を設定する。
 
-**Invoking function locally through local API Gateway**
+一時的に設定するので、再ログイン時には消えてしまうので注意。
 
 ```bash
-sam local start-api
+export SLACK_TOKEN=xoxb-...
 ```
 
-If the previous command ran successfully you should now be able to hit the following local endpoint to invoke your function `http://localhost:3000/hello`
+また、goとして動かしたいときはMakefileを使用するのが便利。
 
-**SAM CLI** is used to emulate both Lambda and API Gateway locally and uses our `template.yaml` to understand how to bootstrap this environment (runtime, where the source code is, etc.) - The following excerpt is what the CLI will read in order to initialize an API and its routes:
+```bash
+make run
+```
+
+lambdaとして試験する場合はビルドしてからテストする。
+
+build
+
+```bash
+sam build
+```
+
+テスト。
+
+```bash
+sam local invoke
+```
+
+## AWSにデプロイする前に
+
+secret managerにslackのAPIキーを設定すること。
+
+![](./docs/API-KEY.jpg)
+
+slackのtokenは公開したくないため、以下のようにシークレットマネージャーから取得している。
 
 ```yaml
-...
-Events:
-    HelloWorld:
-        Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-        Properties:
-            Path: /hello
-            Method: get
+      Environment:
+        Variables:
+          SLACK_TOKEN: '{{resolve:secretsmanager:API-KEY:SecretString:SLACK_API_KEY}}'
+          SLACK_CHANNEL: information
 ```
 
-## Packaging and deployment
 
-AWS Lambda Golang runtime requires a flat folder with the executable generated on build step. SAM will use `CodeUri` property to know where to look up for the application:
-
-```yaml
-...
-    FirstFunction:
-        Type: AWS::Serverless::Function
-        Properties:
-            CodeUri: hello_world/
-            ...
-```
-
-To deploy your application for the first time, run the following in your shell:
-
-```bash
-sam deploy --guided
-```
-
-The command will package and deploy your application to AWS, with a series of prompts:
-
-* **Stack Name**: The name of the stack to deploy to CloudFormation. This should be unique to your account and region, and a good starting point would be something matching your project name.
-* **AWS Region**: The AWS region you want to deploy your app to.
-* **Confirm changes before deploy**: If set to yes, any change sets will be shown to you before execution for manual review. If set to no, the AWS SAM CLI will automatically deploy application changes.
-* **Allow SAM CLI IAM role creation**: Many AWS SAM templates, including this example, create AWS IAM roles required for the AWS Lambda function(s) included to access AWS services. By default, these are scoped down to minimum required permissions. To deploy an AWS CloudFormation stack which creates or modifies IAM roles, the `CAPABILITY_IAM` value for `capabilities` must be provided. If permission isn't provided through this prompt, to deploy this example you must explicitly pass `--capabilities CAPABILITY_IAM` to the `sam deploy` command.
-* **Save arguments to samconfig.toml**: If set to yes, your choices will be saved to a configuration file inside the project, so that in the future you can just re-run `sam deploy` without parameters to deploy changes to your application.
-
-You can find your API Gateway Endpoint URL in the output values displayed after deployment.
-
-### Testing
-
-We use `testing` package that is built-in in Golang and you can simply run the following command to run our tests:
-
-```shell
-cd ./hello-world/
-go test -v .
-```
-# Appendix
-
-### Golang installation
-
-Please ensure Go 1.x (where 'x' is the latest version) is installed as per the instructions on the official golang website: https://golang.org/doc/install
-
-A quickstart way would be to use Homebrew, chocolatey or your linux package manager.
-
-#### Homebrew (Mac)
-
-Issue the following command from the terminal:
-
-```shell
-brew install golang
-```
-
-If it's already installed, run the following command to ensure it's the latest version:
-
-```shell
-brew update
-brew upgrade golang
-```
-
-#### Chocolatey (Windows)
-
-Issue the following command from the powershell:
-
-```shell
-choco install golang
-```
-
-If it's already installed, run the following command to ensure it's the latest version:
-
-```shell
-choco upgrade golang
-```
-
-## Bringing to the next level
-
-Here are a few ideas that you can use to get more acquainted as to how this overall process works:
-
-* Create an additional API resource (e.g. /hello/{proxy+}) and return the name requested through this new path
-* Update unit test to capture that
-* Package & Deploy
-
-Next, you can use the following resources to know more about beyond hello world samples and how others structure their Serverless applications:
-
-* [AWS Serverless Application Repository](https://aws.amazon.com/serverless/serverlessrepo/)
