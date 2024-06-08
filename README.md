@@ -44,17 +44,17 @@ sam local invoke
 
 ## AWSにデプロイする前に
 
-secret managerにslackのAPIキーを設定すること。
+パラメータストアにslackのAPIキーを設定すること。
 
-![](./docs/API-KEY.jpg)
+![](./docs/parameter.jpg)
 
-slackのtokenは公開したくないため、以下のようにシークレットマネージャーから取得している。
+以下のようにパラメータストアから取得している。
 
 ```yaml
       Environment:
         Variables:
-          SLACK_TOKEN: '{{resolve:secretsmanager:API-KEY:SecretString:SLACK_API_KEY}}'
-          SLACK_CHANNEL: information
+            SLACK_TOKEN: '{{resolve:ssm:/SLACK_API_KEY}}'
+            SLACK_CHANNEL: information
 ```
 
 

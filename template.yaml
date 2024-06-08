@@ -72,8 +72,8 @@ Resources:
             Description: cost
       Environment:
         Variables:
-          SLACK_TOKEN: '{{resolve:secretsmanager:API-KEY:SecretString:SLACK_API_KEY}}'
-          SLACK_CHANNEL: information
+            SLACK_TOKEN: '{{resolve:ssm:/SLACK_API_KEY}}'
+            SLACK_CHANNEL: information
 
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
