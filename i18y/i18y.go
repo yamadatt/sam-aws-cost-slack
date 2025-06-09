@@ -26,8 +26,6 @@ var (
 	configByte embed.FS
 )
 
-type Messages map[string]map[string]string
-
 func Init() error {
 	files, err := configByte.ReadDir(LanguagesDir)
 	if err != nil {
