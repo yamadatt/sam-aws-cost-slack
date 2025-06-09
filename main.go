@@ -100,8 +100,7 @@ func handler() error {
 	}
 
 	now := time.Now()
-	yesterday := now.AddDate(0, 0, -1)
-	text := i18y.Translate(Language, "title", fullName, yesterday.Format("2006-01-02"), cost[1].Total)
+	text := i18y.Translate(Language, "title", fullName, now.Format("2006-01"), cost[0].Total)
 	option := slack.MsgOptionText(text, false)
 
 	attachments, err := toAttachment(cost)
@@ -165,50 +164,21 @@ func toCost(result *costexplorer.Group) (ServiceDetail, error) {
 }
 
 func toAttachment(cost []DailyCost) ([]slack.Attachment, error) {
-	// Just day before yesterday and yesterday
-	if len(cost) != 3 {
-		return nil, fmt.Errorf("cost length is not 3")
+	if len(cost) != 1 {
+		return nil, fmt.Errorf("cost length is not 1")
 	}
 
-	// preallocate slice capacity to avoid zero-valued entries
-	attachments := make([]slack.Attachment, 0, len(cost[1].Services))
-	for name, detail := range cost[1].Services {
-		color := "#00ff00"
-
-		priceDiffStatement := ""
-		before, ok := cost[0].Services[name]
-		if ok {
-			diff := ((detail.CostAmount / before.CostAmount) - 1) * 100
-
-			if !math.IsNaN(diff) {
-				diffMark := ""
-				// Set red color if diff is over 100%
-				if diff == 0 {
-					color = "#ffffff"
-				} else if diff > 0 {
-					color = "#ff0000"
-					diffMark = "📈"
-				} else {
-					color = "#0000ff"
-					diffMark = "📉"
-				}
-
-				priceDiffStatement = fmt.Sprintf(
-					" ( %s %.3f%% )",
-					diffMark,
-					diff,
-				)
-			}
-		}
+	attachments := make([]slack.Attachment, 0, len(cost[0].Services))
+	for name, detail := range cost[0].Services {
+		color := "#ffffff"
 
 		fields := []slack.AttachmentField{
 			{
 				Title: i18y.Translate(Language, "cost"),
 				Value: fmt.Sprintf(
-					"%.3f%s%s",
+					"%.3f%s",
 					detail.CostAmount,
 					detail.CostUnit,
-					priceDiffStatement,
 				),
 				Short: true,
 			},

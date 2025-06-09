@@ -1,3 +1,3 @@
-title: "%s : %s のコスト : `$%.3f`"
+title: "%s : %s の累計コスト : `$%.3f`"
 cost: 料金
 usage: 利用量

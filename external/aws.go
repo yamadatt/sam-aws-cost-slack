@@ -80,10 +80,10 @@ func GetIconURL(service string) string {
 
 func GetCost() (*costexplorer.GetCostAndUsageOutput, error) {
 	now := time.Now()
-	end := now.Format("2006-01-02")
-	twoDaysBefore := now.AddDate(0, 0, -3).Format("2006-01-02")
+	startOfMonth := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location()).Format("2006-01-02")
+	tomorrow := now.AddDate(0, 0, 1).Format("2006-01-02")
 
-	granularity := "DAILY"
+	granularity := "MONTHLY"
 	metrics := []string{
 		"AmortizedCost",
 		"BlendedCost",
@@ -101,8 +101,8 @@ func GetCost() (*costexplorer.GetCostAndUsageOutput, error) {
 	svc := costexplorer.New(sess)
 	result, err := svc.GetCostAndUsage(&costexplorer.GetCostAndUsageInput{
 		TimePeriod: &costexplorer.DateInterval{
-			Start: aws.String(twoDaysBefore),
-			End:   aws.String(end),
+			Start: aws.String(startOfMonth),
+			End:   aws.String(tomorrow),
 		},
 		Granularity: aws.String(granularity),
 		GroupBy: []*costexplorer.GroupDefinition{
