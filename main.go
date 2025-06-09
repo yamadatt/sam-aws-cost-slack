@@ -170,7 +170,8 @@ func toAttachment(cost []DailyCost) ([]slack.Attachment, error) {
 		return nil, fmt.Errorf("cost length is not 3")
 	}
 
-	attachments := make([]slack.Attachment, len(cost[1].Services))
+	// preallocate slice capacity to avoid zero-valued entries
+	attachments := make([]slack.Attachment, 0, len(cost[1].Services))
 	for name, detail := range cost[1].Services {
 		color := "#00ff00"
 
