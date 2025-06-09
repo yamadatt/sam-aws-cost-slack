@@ -7,19 +7,20 @@ https://github.com/tetsuya28/aws-cost-report
 
 ## 何ができるの？
 
-以下のように毎朝9:00に前日のAWS利用料をslackに通知する。
+以下のように毎朝9:00に当月累計のAWS利用料をslackに通知する。
 
 ![](./docs/Slack-example.jpg)
 
 
 ## ローカルでテストしたい場合
 
-環境変数に```SLACK_TOKEN```を設定する。
-
-一時的に設定するので、再ログイン時には消えてしまうので注意。
+環境変数に`SLACK_TOKEN`と`SLACK_CHANNEL`を設定する。必要に応じて`LANGUAGE`も設定する（デフォルト: ja）。
 
 ```bash
 export SLACK_TOKEN=xoxb-...
+export SLACK_CHANNEL=information
+# 英語で通知したい場合
+export LANGUAGE=en
 ```
 
 また、goとして動かしたいときはMakefileを使用するのが便利。
