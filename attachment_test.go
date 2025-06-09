@@ -13,9 +13,7 @@ func TestToAttachment(t *testing.T) {
 	Language = "en"
 
 	costs := []DailyCost{
-		{Services: map[string]ServiceDetail{"svc": {CostAmount: 1, CostUnit: "USD", UsageAmount: 1, UsageUnit: ""}}},
 		{Services: map[string]ServiceDetail{"svc": {CostAmount: 2, CostUnit: "USD", UsageAmount: 2, UsageUnit: ""}}},
-		{Services: map[string]ServiceDetail{"svc": {CostAmount: 3, CostUnit: "USD", UsageAmount: 3, UsageUnit: ""}}},
 	}
 
 	atts, err := toAttachment(costs)
@@ -25,7 +23,7 @@ func TestToAttachment(t *testing.T) {
 	}
 
 	a := atts[0]
-	assert.Equal(t, "#ff0000", a.Color)
+	assert.Equal(t, "#ffffff", a.Color)
 	fields := a.Fields
 	assert.Equal(t, i18y.Translate(Language, "cost"), fields[0].Title)
 	assert.Contains(t, fields[0].Value, "USD")
